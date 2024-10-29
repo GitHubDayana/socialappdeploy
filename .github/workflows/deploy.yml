@@ -29,4 +29,4 @@ jobs:
           aws deploy create-deployment \
             --application-name ${{ secrets.CODEDEPLOY_APP }} \
             --deployment-group-name ${{ secrets.CODEDEPLOY_GROUP }} \
-            --revision "{\"revisionType\":\"GitHub\",\"gitHubLocation\":{\"repository\":\"saiprasadr870/social-app\",\"commitId\":\"main\"}}"
+            --revision "{\"revisionType\":\"GitHub\",\"gitHubLocation\":{\"repository\":\"saiprasadr870/social-app\",\"branch\":\"main\"}}"
