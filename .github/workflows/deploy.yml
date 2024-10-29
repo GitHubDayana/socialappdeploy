@@ -10,9 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Check out the code from the repository
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Step 2: Set up AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -20,13 +22,15 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Zip application files
-        run: |
-          zip -r social-app.zip .  # Create a ZIP file with the repository contents
+      # Step 3: Get the latest commit ID
+      - name: Get latest commit ID
+        id: get_commit
+        run: echo "::set-output name=commit_id::$(git rev-parse HEAD)"
 
+      # Step 4: Deploy to CodeDeploy using the latest commit ID
       - name: Deploy with CodeDeploy
         run: |
           aws deploy create-deployment \
             --application-name ${{ secrets.CODEDEPLOY_APP }} \
             --deployment-group-name ${{ secrets.CODEDEPLOY_GROUP }} \
-            --revision "{\"revisionType\":\"GitHub\",\"gitHubLocation\":{\"repository\":\"saiprasadr870/social-app\",\"branch\":\"main\"}}"
+            --revision "{\"revisionType\":\"GitHub\",\"gitHubLocation\":{\"repository\":\"saiprasadr870/social-app\",\"commitId\":\"${{ steps.get_commit.outputs.commit_id }}\"}}"
