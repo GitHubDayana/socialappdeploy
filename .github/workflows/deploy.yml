@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the code from the repository
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -22,15 +20,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Step 3: Zip the application files for CodeDeploy
       - name: Zip application files
         run: |
           zip -r social-app.zip .  # Create a ZIP file with the repository contents
 
-      # Step 4: Deploy to CodeDeploy using GitHub revision
       - name: Deploy with CodeDeploy
         run: |
           aws deploy create-deployment \
             --application-name ${{ secrets.CODEDEPLOY_APP }} \
             --deployment-group-name ${{ secrets.CODEDEPLOY_GROUP }} \
-            --revision "revisionType=GitHub,gitHubLocation={\"repository\":\"saiprasadr870/social-app\",\"commitId\":\"main\"}"
+            --revision "{\"revisionType\":\"GitHub\",\"gitHubLocation\":{\"repository\":\"saiprasadr870/social-app\",\"commitId\":\"main\"}}"
