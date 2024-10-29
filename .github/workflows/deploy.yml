@@ -1,0 +1,41 @@
+name: Deploy to EC2 using CodeDeploy
+
+on:
+  push:
+    branches:
+      - main  # Triggers on push to main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Step 3: Zip the application code for deployment
+      - name: Zip application files
+        run: |
+          zip -r social-app.zip .  # Zip the entire repo contents
+
+      # Step 4: Upload the zipped application to S3
+      - name: Upload to S3
+        run: |
+          aws s3 cp social-app.zip s3://${{ secrets.S3_BUCKET }}/social-app.zip
+
+      # Step 5: Create a new deployment in CodeDeploy
+      - name: Trigger CodeDeploy deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ secrets.CODEDEPLOY_APP }} \
+            --deployment-group-name ${{ secrets.CODEDEPLOY_GROUP }} \
+            --s3-location bucket=${{ secrets.S3_BUCKET }},bundleType=zip,key=social-app.zip
