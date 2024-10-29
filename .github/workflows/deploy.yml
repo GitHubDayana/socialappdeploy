@@ -3,7 +3,7 @@ name: Deploy to EC2 using CodeDeploy
 on:
   push:
     branches:
-      - main  # Triggers on push to the main branch
+      - main  # Triggers the workflow on pushes to the main branch
 
 jobs:
   deploy:
@@ -25,7 +25,7 @@ jobs:
       # Step 3: Zip the application files for CodeDeploy
       - name: Zip application files
         run: |
-          zip -r social-app.zip .  # Zip all files in the repository
+          zip -r social-app.zip .  # Create a ZIP file with the repository contents
 
       # Step 4: Deploy to CodeDeploy using GitHub revision
       - name: Deploy with CodeDeploy
